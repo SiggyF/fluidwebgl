@@ -200,28 +200,14 @@ Promise.all([vertexSource, fragmentSource])
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
         // At init time. Clear the back buffer.
-        // gl.clearColor(1.0, 1.0, 1.0, 0.0);
-        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.clearColor(0.0, 0.0, 0.0, 0.0);
+        // gl.clear(gl.COLOR_BUFFER_BIT);
 
         // // Turn off rendering to alpha
         // gl.colorMask(true, true, true, true);
-        var i = 0;
         render = function(){
             // upload all the current textures
-            // gl.clear(gl.COLOR_BUFFER_BIT);
-            i += 1;
-            gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffers[0].fbo);
-            // console.log(framebuffers[0].fbo);
-            // console.log('loading texture', t, i);
-            var webglTexture = textures[0];
-            gl.bindTexture(gl.TEXTURE_2D, webglTexture.texture);
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, webglTexture.element);
-
-            // draw webgl texture in fbo0
-            gl.drawArrays(gl.TRIANGLES, 0, 6);
-
-            // switch to drawing buffer
-            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+            gl.clear(gl.COLOR_BUFFER_BIT);
 
             var drawingTexture = textures[1];
             gl.bindTexture(gl.TEXTURE_2D, drawingTexture.texture);
@@ -233,6 +219,18 @@ Promise.all([vertexSource, fragmentSource])
 
             gl.drawArrays(gl.TRIANGLES, 0, 6);
             drawingContext.clearRect(0, 0, drawing.width, drawing.height);
+
+            // draw the same thing to the frame buffer
+            gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffers[0].fbo);
+            var webglTexture = textures[0];
+            gl.bindTexture(gl.TEXTURE_2D, webglTexture.texture);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, webglTexture.element);
+
+            // draw webgl texture in fbo0
+            gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+            // switch to drawing buffer
+            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
             // Draw the rectangle.
             requestAnimationFrame(render);
