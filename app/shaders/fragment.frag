@@ -18,17 +18,23 @@ varying vec2 v_texCoord;
 
 void main() {
 
+  // get uv velocity
+  vec4 coloruv = texture2D(u_imageuv, v_texCoord);
+  // uv in pixels/frame (0.5/128.0) -> correction for
+  vec2 uv = vec2(( coloruv[0] - 0.5 )/0.5 , (coloruv[1] - 0.5)/0.5) - (1.0/256.0) ;
+
+  if (abs(uv).x + abs(uv).y <= 0.005) {
+    gl_FragColor.a = 0.0;
+    discard;
+  }
+
   // get color from drawing
   vec4 colordrawing = texture2D(u_imagedrawing, v_texCoord);
 
   // old color at current location
   vec4 colorold = texture2D(u_imagewebgl, v_texCoord);
 
-  // get uv velocity
-  vec4 coloruv = texture2D(u_imageuv, v_texCoord);
 
-  // uv in pixels/frame
-  vec2 uv = vec2((coloruv[0] - 0.5 )/0.5 , (coloruv[1] - 0.5)/0.5)  - 1.0/256.0;
 
   // get advected color from previous texture
   // vec4 colornew = texture2D(u_imagewebgl, v_texCoord - uv/100.0 ) ;
@@ -41,9 +47,6 @@ void main() {
 
   // gl_FragColor = vec4(min(colornew.rgb, colordrawing.rgb), max(colornew[3], colordrawing[3]));
   gl_FragColor = mix(colornew, colordrawing, colordrawing.a);
-  if (abs(uv).x + abs(uv).y <= 0.0001) {
-    gl_FragColor.a = 0.0;
-  }
   // gl_FragColor.a = min(gl_FragColor.a, abs(uv).x + abs(uv).y);
   // gl_FragColor = colornew + colordrawing;
 

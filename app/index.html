@@ -11,6 +11,7 @@
 
     <!-- build:css styles/vendor.css -->
     <!-- bower:css -->
+    <link rel="stylesheet" href="/bower_components/leaflet/dist/leaflet.css" />
     <!-- endbower -->
     <!-- endbuild -->
 
@@ -33,14 +34,15 @@
 
     <div class="fluid-container">
       <div class="row">
+        <div id="map"></div>
         <div class="layer ">
           <img id="uv" src="/images/UV.png" alt="uv" />
         </div>
         <div class="layer">
-          <canvas id="webgl" width="1000" height="1000"></canvas>
+          <canvas id="webgl" width="680" height="1000"></canvas>
         </div>
         <div class="layer" id="drawingcontainer">
-          <canvas id="drawing" width="1000" height="1000"></canvas>
+          <canvas id="drawing" width="680" height="1000"></canvas>
         </div>
       </div>
 
@@ -54,6 +56,8 @@
     <script src="/bower_components/es6-promise/promise.js"></script>
     <script src="/bower_components/sketch.js/js/sketch.js"></script>
     <script src="/bower_components/lodash/lodash.js"></script>
+    <script src="/bower_components/leaflet/dist/leaflet.js"></script>
+    <script src="/bower_components/leaflet/dist/leaflet-src.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
@@ -76,6 +80,7 @@
     <script src="scripts/webgl-utils.js"></script>
     <script src="scripts/main.js"></script>
     <script src="scripts/draw.js"></script>
+    <script src="scripts/map.js"></script>
     <!-- endbuild -->
 
   </body>

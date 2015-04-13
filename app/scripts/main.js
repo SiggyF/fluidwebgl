@@ -96,7 +96,7 @@ Promise.all([vertexSource, fragmentSource])
             {
                 name: 'uv',
                 clamping: gl.CLAMP_TO_EDGE,
-                interpolation: gl.LINEAR,
+                interpolation: gl.NEAREST,
                 texture: null,
                 sampler: null,
                 fbo: null,
