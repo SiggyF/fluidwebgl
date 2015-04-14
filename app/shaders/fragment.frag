@@ -27,13 +27,14 @@ void main() {
   vec2 uv = vec2(
                  (coloruv[0] - 0.5)/0.5,
                  -(coloruv[1] - 0.5)/0.5
-                 ) - (1.0/256.0) ;
+                 ) - vec2(1.0/256.0, -1.0/256.0) ;
 
   // if we don't have a velocity, stop rendering
-  if (abs(uv).x + abs(uv).y <= 0.005) {
+  if (abs(uv).x + abs(uv).y <= 0.001) {
     // gl_FragColor.a = 0.0;
     discard;
   }
+
 
   // get color from drawing
   vec4 colordrawing = texture2D(u_imagedrawing, v_texCoord);
@@ -43,8 +44,8 @@ void main() {
   vec4 colornew = texture2D(u_imagedrawing0, v_texCoord - uv/60.0);
 
   // Either mix the color or just add them
-  // gl_FragColor = mix(colornew, colordrawing, colordrawing.a);
-  gl_FragColor = colornew+colordrawing;
+  gl_FragColor = mix(colornew, colordrawing, colordrawing.a);
+  // gl_FragColor = colornew+colordrawing;
 
 
 }

@@ -1,4 +1,5 @@
 var COLOURS = [ '#E3EB64', '#A7EBCA', '#DD2244', '#D8EBA7', '#868E80' ];
+// var COLOURS = [ '#222222', '#444444' ];
 // var COLOURS = [ '#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF'];
 // var COLOURS = [ '#FF2244', '#FF2244', '#FF2244', '#FF2244', '#FF2244'];
 var radius = 0;
@@ -9,7 +10,7 @@ Sketch.create({
     autoclear: false,
     fullscreen: false,
     // strokeStyle: 'hsla(200, 50%, 50%, .4)',
-    globalCompositeOperation: 'over',
+    // globalCompositeOperation: 'darker',
     setup: function() {
         console.log( 'setup' );
     },
@@ -29,7 +30,8 @@ Sketch.create({
             touch = this.touches[i];
             this.lineCap = 'round';
             this.lineJoin = 'round';
-            this.fillStyle = this.strokeStyle = 'black';
+            this.fillStyle = this.strokeStyle = COLOURS[Math.floor(Math.random()*COLOURS.length)];
+            // this.fillStyle = this.strokeStyle = 'black';
             this.lineWidth = radius;
             this.beginPath();
             this.moveTo( touch.ox, touch.oy );

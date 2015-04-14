@@ -9,7 +9,10 @@ var textures = [];
 var render;
 
 // do all the messy work
-var gl = setupWebGL(webgl, {preserveDrawingBuffer: true});
+var gl = setupWebGL(webgl, {
+    preserveDrawingBuffer: true,
+    premultipliedAlpha: false
+});
 
 // download vertex source
 var vertex = document.getElementById('vertex');
@@ -200,14 +203,15 @@ Promise.all([vertexSource, fragmentSource])
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
         // At init time. Clear the back buffer.
-        gl.clearColor(0.0, 0.0, 0.0, 0.0);
-        // gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.clearColor(1.0, 1.0, 0.0, 0.0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
 
         // // Turn off rendering to alpha
         // gl.colorMask(true, true, true, true);
         render = function(){
             // upload all the current textures
             gl.clear(gl.COLOR_BUFFER_BIT);
+
 
             var drawingTexture = textures[1];
             gl.bindTexture(gl.TEXTURE_2D, drawingTexture.texture);
@@ -218,19 +222,20 @@ Promise.all([vertexSource, fragmentSource])
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, uvTexture.element);
 
             gl.drawArrays(gl.TRIANGLES, 0, 6);
-            drawingContext.clearRect(0, 0, drawing.width, drawing.height);
 
             // draw the same thing to the frame buffer
             gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffers[0].fbo);
+            // draw the webgl to the framebuffer
             var webglTexture = textures[0];
             gl.bindTexture(gl.TEXTURE_2D, webglTexture.texture);
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, webglTexture.element);
-
             // draw webgl texture in fbo0
             gl.drawArrays(gl.TRIANGLES, 0, 6);
 
             // switch to drawing buffer
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+            // clear the drawing
+            drawingContext.clearRect(0, 0, drawing.width, drawing.height);
 
             // Draw the rectangle.
             requestAnimationFrame(render);
