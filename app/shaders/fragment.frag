@@ -19,14 +19,14 @@ varying vec2 v_texCoord;
 void main() {
 
   // get uv velocity
-  vec2 flipCoord = vec2(v_texCoord[0], v_texCoord[1]);
+  vec2 flipCoord = vec2(v_texCoord[0], 1.0-v_texCoord[1]);
   // I want to flip y, but can't get it working
   vec4 coloruv = texture2D(u_imageuv, flipCoord);
 
   // uv in pixels/frame (0.5/128.0) -> correction for
   vec2 uv = vec2(
                  (coloruv[0] - 0.5)/0.5,
-                 (coloruv[1] - 0.5)/0.5
+                 -(coloruv[1] - 0.5)/0.5
                  ) - (1.0/256.0) ;
 
   // if we don't have a velocity, stop rendering
