@@ -13,6 +13,10 @@ uniform sampler2D u_imagedrawing0;
 // buffer 1
 uniform sampler2D u_imagedrawing1;
 
+uniform vec2 u_webglSize;
+
+uniform bool u_clear3d;
+
 // the texCoords passed in from the vertex shader, in 0,1.
 varying vec2 v_texCoord;
 
@@ -35,7 +39,6 @@ void main() {
   //   discard;
   // }
 
-
   // get color from drawing
   vec4 colordrawing = texture2D(u_imagedrawing, v_texCoord);
 
@@ -52,7 +55,17 @@ void main() {
   // gl_FragColor = colornew+colordrawing;
   if (colorold.rgb == gl_FragColor.rgb) {
     // 1  less opaque if color remains constant
-    gl_FragColor.a = gl_FragColor.a - 1.0/256.0;
+    gl_FragColor.a = max(gl_FragColor.a - 1.0/256.0, 0.0);
   }
+  if (abs(uv).x  + abs(uv).y <= 0.0001) {
+    // 5 less opaque if u, v = 0
+    gl_FragColor.a = max(gl_FragColor.a - 5.0/256.0, 0.0);
+  }
+
+  if (u_clear3d) {
+    // clear if clear, workaround
+    gl_FragColor.a = 0.0;
+  };
+
 
 }

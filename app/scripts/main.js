@@ -20,14 +20,6 @@ var gl = setupWebGL(webgl, {
 });
 
 
-// settings for gui
-var settings = {
-    clear2d: true,
-    clear3d: true
-};
-var gui = new dat.GUI();
-gui.add(settings, 'clear2d');
-gui.add(settings, 'clear3d');
 
 
 // download vertex source
@@ -86,6 +78,7 @@ Promise.all([vertexSource, fragmentSource])
         var webglSizeLocation = gl.getUniformLocation(program, "u_webglSize");
         // set the texture size
         gl.uniform2f(webglSizeLocation, webgl.width, webgl.height);
+        console.log('webglsize', webglSizeLocation);
 
         // create name textures
 
@@ -177,7 +170,7 @@ Promise.all([vertexSource, fragmentSource])
                 width: webgl.width,
                 height: webgl.height
             }
-        ]
+        ];
 
         // Create a framebuffer
         _.each(framebuffers, function(t, i){
@@ -223,6 +216,34 @@ Promise.all([vertexSource, fragmentSource])
 
 
         });
+
+        // select all webgl compatabile settings
+        var glSettings = _.filter(
+            // lookup all settings and convert to objects
+            _.map(
+                settings,
+                function(value, key, list){
+                    return {
+                        name: key,
+                        value: value,
+                        gl: (typeof value) == 'number' || (typeof value == 'boolean'),
+                        type: (typeof value)
+                    };
+                }),
+            function(setting){
+                return setting.gl;
+            }
+        );
+
+        _.each(glSettings, function(setting){
+            console.log(setting);
+            // location of the setting in the graphics card
+            setting.location = gl.getUniformLocation(program, "u_" + setting.name);
+            // set the value
+            gl.uniform1f(setting.location, setting.value);
+        });
+        console.log(glSettings);
+
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
         // At init time. Clear the back buffer.
@@ -252,7 +273,6 @@ Promise.all([vertexSource, fragmentSource])
             if (stop) {
                 return;
             }
-
             // request another frame
 
             requestAnimationFrame(render);
@@ -265,6 +285,22 @@ Promise.all([vertexSource, fragmentSource])
             // if enough time has elapsed, draw the next frame
 
             if (elapsed > fpsInterval) {
+
+                // first update the settings
+                _.each(glSettings, function(setting){
+                    // keep 2 objects in sync....
+                    // no update, keep going
+                    if (setting.value == settings[setting.name]) {
+                        return;
+                    }
+                    // update, let's set it in memory
+                    setting.value = settings[setting.name];
+                    if (setting.type === 'boolean') {
+                        console.log('updating setting', setting);
+                        gl.uniform1i(setting.location, setting.value);
+                    };
+                });
+
 
                 // Get ready for next frame by setting then=now, but...
                 // Also, adjust for fpsInterval not being multiple of 16.67
@@ -287,8 +323,6 @@ Promise.all([vertexSource, fragmentSource])
                 // draw the same thing to the frame buffer
                 gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffers[0].fbo);
                 if (settings.clear3d) {
-                    gl.clearColor(1.0, 1.0, 1.0, 0.0);
-                    gl.colorMask(true, true, true, true);
                     gl.clear(gl.COLOR_BUFFER_BIT);
                 }
 
@@ -309,12 +343,14 @@ Promise.all([vertexSource, fragmentSource])
                 var sinceStart = now - startTime;
                 var currentFps = Math.round(1000 / (sinceStart / ++frameCount) * 100) / 100;
                 // upload to the gpu so we can scale
-                console.log("Elapsed time= " + Math.round(sinceStart / 1000 * 100) / 100 + " secs @ " + currentFps + " fps.");
+                if ((frameCount % 100) == 0) {
+                    console.log("Elapsed time:", Math.round(sinceStart / 1000 * 100) / 100, 'fps', currentFps, 'frameCount:', frameCount);
+                }
 
             }
         };
 
-        startAnimating(40);
+        startAnimating(20);
     });
 
 

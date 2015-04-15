@@ -26,6 +26,9 @@ Sketch.create({
     // scalability. If you only need to handle the mouse / desktop browsers,
     // use the 0th touch element and you get wider device support for free.
     touchmove: function() {
+        if (this.keys.SHIFT) {
+            return;
+        }
         for ( var i = this.touches.length - 1, touch; i >= 0; i-- ) {
             touch = this.touches[i];
             this.lineCap = 'round';
