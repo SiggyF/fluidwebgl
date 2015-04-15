@@ -1,7 +1,7 @@
 // settings for gui
 var settings = {
-    clear2d: true,
-    clear3d: true,
+    clear2d: false,
+    clear3d: false,
     togglemap: function(){$('#map').toggle();}
 };
 var gui = new dat.GUI();

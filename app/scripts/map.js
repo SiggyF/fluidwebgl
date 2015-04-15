@@ -1,3 +1,71 @@
+
+/*globals L */
+
+/*
+ * L.ImageOverlay is used to overlay images over the map (to specific geographical bounds).
+ */
+L.ImageOverlay.Canvas = L.ImageOverlay.extend({
+    includes: L.Mixin.Events,
+
+    options: {
+        width: 1000,
+        height: 1000
+    },
+
+    initialize: function (bounds, options) { // (LatLngBounds, Object)
+        this._bounds = L.latLngBounds(bounds);
+
+        L.Util.setOptions(this, options);
+    },
+
+    _initImage: function () {
+        var topLeft = this._map.latLngToLayerPoint(this._bounds.getNorthWest())
+        var size = this._map.latLngToLayerPoint(this._bounds.getSouthEast())._subtract(topLeft);
+
+        this._image = this.canvas = L.DomUtil.create('canvas', 'leaflet-image-layer');
+        if (this.options.id) {
+            this._image.id = this.options.id;
+        };
+        this._image.width  = this.options.width;
+        this._image.height = this.options.width;
+
+        if (this._map.options.zoomAnimation && L.Browser.any3d) {
+            L.DomUtil.addClass(this._image, 'leaflet-zoom-animated');
+        } else {
+            L.DomUtil.addClass(this._image, 'leaflet-zoom-hide');
+        }
+
+        this._updateOpacity();
+
+        //TODO createImage util method to remove duplication
+        L.Util.extend(this._image, {
+            galleryimg: 'no',
+            onselectstart: L.Util.falseFn,
+            onmousemove: L.Util.falseFn,
+            onload: L.Util.bind(this._onImageLoad, this)
+        });
+    },
+
+    _reset: function () {
+        var image   = this._image,
+            topLeft = this._map.latLngToLayerPoint(this._bounds.getNorthWest()),
+            size = this._map.latLngToLayerPoint(this._bounds.getSouthEast())._subtract(topLeft);
+
+        L.DomUtil.setPosition(image, topLeft);
+
+        image.style.width  = size.x + 'px';
+        image.style.height = size.y + 'px';
+    },
+
+    _onImageLoad: function () {
+        this.fire('load');
+    }
+});
+
+L.imageOverlay.canvas = function (bounds, options) {
+    return new L.ImageOverlay.Canvas(bounds, options);
+};
+
 // create a map in the "map" div, set the view to a given place and zoom
 var map = L.map('map').setView([37.92, -122.07], 10);
 
@@ -10,3 +78,8 @@ L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
     id: 'examples.map-i875mjb7'
 }).addTo(map);
 
+var southWest = L.latLng(37.405, -122.66),
+    northEast = L.latLng(38.305, -121.885),
+    bounds = L.latLngBounds(southWest, northEast);
+L.imageOverlay.canvas(bounds, {id: 'webgl'}).addTo(map);
+L.imageOverlay.canvas(bounds, {id: 'drawing'}).addTo(map);

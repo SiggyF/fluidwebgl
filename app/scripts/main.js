@@ -350,7 +350,7 @@ Promise.all([vertexSource, fragmentSource])
             }
         };
 
-        startAnimating(20);
+        startAnimating(30);
     });
 
 

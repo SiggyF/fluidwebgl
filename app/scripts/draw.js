@@ -3,12 +3,13 @@ var COLOURS = [ '#E3EB64', '#A7EBCA', '#DD2244', '#D8EBA7', '#868E80' ];
 // var COLOURS = [ '#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF'];
 // var COLOURS = [ '#FF2244', '#FF2244', '#FF2244', '#FF2244', '#FF2244'];
 var radius = 0;
-Sketch.create({
+var sketch = Sketch.create({
     element: document.getElementById('drawing'),
     // if you don't pass a container, Sketch wil append the element to the body
     container: document.getElementById('drawingcontainer'),
     autoclear: false,
     fullscreen: false,
+    exists: true,
     // strokeStyle: 'hsla(200, 50%, 50%, .4)',
     // globalCompositeOperation: 'darker',
     setup: function() {
@@ -26,7 +27,7 @@ Sketch.create({
     // scalability. If you only need to handle the mouse / desktop browsers,
     // use the 0th touch element and you get wider device support for free.
     touchmove: function() {
-        if (this.keys.SHIFT) {
+        if (!this.keys.SHIFT) {
             return;
         }
         for ( var i = this.touches.length - 1, touch; i >= 0; i-- ) {
@@ -42,6 +43,22 @@ Sketch.create({
             this.stroke();
             this.fill();
         }
+    },
+    click: function() {
+        for ( var i = this.touches.length - 1, touch; i >= 0; i-- ) {
+            touch = this.touches[i];
+            this.lineCap = 'round';
+            this.lineJoin = 'round';
+            this.fillStyle = this.strokeStyle = COLOURS[Math.floor(Math.random()*COLOURS.length)];
+            // this.fillStyle = this.strokeStyle = 'black';
+            this.lineWidth = radius;
+            this.beginPath();
+            this.moveTo( touch.ox, touch.oy );
+            this.arc(touch.ox, touch.oy, radius, 0, 2*Math.PI);
+            this.stroke();
+            this.fill();
+        }
+        console.log('click', this);
     }
     // touchmove: function() {
     //     for ( var i = this.touches.length - 1, touch; i >= 0; i-- ) {
@@ -72,3 +89,6 @@ Sketch.create({
     //     }
     // }
 });
+// map.on('viewreset', function(evt){
+//     console.log('we should resize');
+// });

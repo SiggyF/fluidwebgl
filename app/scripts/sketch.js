@@ -309,6 +309,9 @@
             touch.x = touch.pageX - bounds.left - (win.scrollX || win.pageXOffset);
             touch.y = touch.pageY - bounds.top - (win.scrollY || win.pageYOffset);
 
+            touch.x *= target.width/bounds.width;
+            touch.y *= target.height/bounds.height;
+            
             return touch;
         }
 
@@ -547,9 +550,9 @@
                 }
 
             })();
-
-            ( options.container || doc.body ).appendChild( element );
-
+            if (!options.exists) {
+                ( options.container || doc.body ).appendChild( element );
+            }
             return Sketch.augment( context, options );
         },
 
