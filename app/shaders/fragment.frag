@@ -5,9 +5,9 @@ precision mediump float;
 uniform sampler2D u_imagewebgl;
 // current drawing
 uniform sampler2D u_imagedrawing;
+
 // velocities
 uniform sampler2D u_imageuv;
-
 // buffer 0
 uniform sampler2D u_imagedrawing0;
 // buffer 1
@@ -29,23 +29,30 @@ void main() {
                  -(coloruv[1] - 0.5)/0.5
                  ) - vec2(1.0/256.0, -1.0/256.0) ;
 
-  // if we don't have a velocity, stop rendering
-  if (abs(uv).x + abs(uv).y <= 0.001) {
-    // gl_FragColor.a = 0.0;
-    discard;
-  }
+  // // if we don't have a velocity, stop rendering
+  // if (abs(uv).x + abs(uv).y <= 0.0001) {
+  //   // gl_FragColor.a = 0.0;
+  //   discard;
+  // }
 
 
   // get color from drawing
   vec4 colordrawing = texture2D(u_imagedrawing, v_texCoord);
 
+  vec4 colorold = texture2D(u_imagedrawing0, v_texCoord);
+
   // get advected color from previous texture
   // render using the old framebuffer
-  vec4 colornew = texture2D(u_imagedrawing0, v_texCoord - uv/60.0);
+  vec2 source = v_texCoord - uv/60.0;
+  vec4 colornew = texture2D(u_imagedrawing0, source);
+
 
   // Either mix the color or just add them
   gl_FragColor = mix(colornew, colordrawing, colordrawing.a);
   // gl_FragColor = colornew+colordrawing;
-
+  if (colorold.rgb == gl_FragColor.rgb) {
+    // 1  less opaque if color remains constant
+    gl_FragColor.a = gl_FragColor.a - 1.0/256.0;
+  }
 
 }

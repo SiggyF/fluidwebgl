@@ -1,18 +1,34 @@
 /* jshint devel:true */
 'use strict';
 
+
+
 var webgl = document.getElementById('webgl');
 var uv = document.getElementById('uv');
 var drawing = document.getElementById('drawing');
 var drawingContext = drawing.getContext('2d');
 var textures = [];
-var render;
+// var render;
+
+
 
 // do all the messy work
 var gl = setupWebGL(webgl, {
     preserveDrawingBuffer: true,
-    premultipliedAlpha: false
+    premultipliedAlpha: false,
+    stencil: false
 });
+
+
+// settings for gui
+var settings = {
+    clear2d: true,
+    clear3d: true
+};
+var gui = new dat.GUI();
+gui.add(settings, 'clear2d');
+gui.add(settings, 'clear3d');
+
 
 // download vertex source
 var vertex = document.getElementById('vertex');
@@ -198,6 +214,13 @@ Promise.all([vertexSource, fragmentSource])
             gl.framebufferTexture2D(
                 gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, t.texture, 0
             );
+            gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+            // clear the texture
+            // At init time. Clear the back buffer.
+            gl.clearColor(1.0, 1.0, 0.0, 1.0);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
 
         });
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -206,42 +229,92 @@ Promise.all([vertexSource, fragmentSource])
         gl.clearColor(1.0, 1.0, 0.0, 0.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
 
+
+        var stop = false;
+        var frameCount = 0;
+        var fps, fpsInterval, startTime, now, then, elapsed;
+
+
+        function startAnimating(fps) {
+            fpsInterval = 1000 / fps;
+            then = Date.now();
+            startTime = then;
+            console.log(startTime);
+            render();
+        }
+
+
         // // Turn off rendering to alpha
         // gl.colorMask(true, true, true, true);
-        render = function(){
-            // upload all the current textures
-            gl.clear(gl.COLOR_BUFFER_BIT);
+        function render(){
 
+            // stop
+            if (stop) {
+                return;
+            }
 
-            var drawingTexture = textures[1];
-            gl.bindTexture(gl.TEXTURE_2D, drawingTexture.texture);
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, drawingTexture.element);
+            // request another frame
 
-            var uvTexture = textures[2];
-            gl.bindTexture(gl.TEXTURE_2D, uvTexture.texture);
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, uvTexture.element);
-
-            gl.drawArrays(gl.TRIANGLES, 0, 6);
-
-            // draw the same thing to the frame buffer
-            gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffers[0].fbo);
-            // draw the webgl to the framebuffer
-            var webglTexture = textures[0];
-            gl.bindTexture(gl.TEXTURE_2D, webglTexture.texture);
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, webglTexture.element);
-            // draw webgl texture in fbo0
-            gl.drawArrays(gl.TRIANGLES, 0, 6);
-
-            // switch to drawing buffer
-            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-            // clear the drawing
-            drawingContext.clearRect(0, 0, drawing.width, drawing.height);
-
-            // Draw the rectangle.
             requestAnimationFrame(render);
-        }
-        console.log(textures);
-        render();
+
+            // calc elapsed time since last loop
+
+            now = Date.now();
+            elapsed = now - then;
+
+            // if enough time has elapsed, draw the next frame
+
+            if (elapsed > fpsInterval) {
+
+                // Get ready for next frame by setting then=now, but...
+                // Also, adjust for fpsInterval not being multiple of 16.67
+                then = now - (elapsed % fpsInterval);
+
+                // upload all the current textures
+                gl.clear(gl.COLOR_BUFFER_BIT);
+
+
+                var drawingTexture = textures[1];
+                gl.bindTexture(gl.TEXTURE_2D, drawingTexture.texture);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, drawingTexture.element);
+
+                var uvTexture = textures[2];
+                gl.bindTexture(gl.TEXTURE_2D, uvTexture.texture);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, uvTexture.element);
+
+                gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+                // draw the same thing to the frame buffer
+                gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffers[0].fbo);
+                if (settings.clear3d) {
+                    gl.clearColor(1.0, 1.0, 1.0, 0.0);
+                    gl.colorMask(true, true, true, true);
+                    gl.clear(gl.COLOR_BUFFER_BIT);
+                }
+
+                // draw the webgl to the framebuffer
+                var webglTexture = textures[0];
+                gl.bindTexture(gl.TEXTURE_2D, webglTexture.texture);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, webglTexture.element);
+                // draw webgl texture in fbo0
+                gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+                // switch to drawing buffer
+                gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+                // clear the drawing
+                if (settings.clear2d) {
+                    drawingContext.clearRect(0, 0, drawing.width, drawing.height);
+                }
+                // TESTING...Report #seconds since start and achieved fps.
+                var sinceStart = now - startTime;
+                var currentFps = Math.round(1000 / (sinceStart / ++frameCount) * 100) / 100;
+                // upload to the gpu so we can scale
+                console.log("Elapsed time= " + Math.round(sinceStart / 1000 * 100) / 100 + " secs @ " + currentFps + " fps.");
+
+            }
+        };
+
+        startAnimating(40);
     });
 
 
