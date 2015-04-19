@@ -71,6 +71,12 @@ gulp.task('fonts', function () {
     .pipe(gulp.dest('dist/fonts'));
 });
 
+gulp.task('shaders', function () {
+    return gulp.src('app/shaders/**/*')
+        .pipe(gulp.dest('dist/shaders'));
+});
+
+
 gulp.task('extras', function () {
   return gulp.src([
     'app/*.*',
@@ -125,7 +131,7 @@ gulp.task('wiredep', function () {
     .pipe(gulp.dest('app'));
 });
 
-gulp.task('build', ['jshint', 'jscs', 'html', 'images', 'fonts', 'extras'], function () {
+gulp.task('build', ['jshint', 'jscs', 'html', 'images', 'fonts', 'shaders', 'extras'], function () {
   return gulp.src('dist/**/*').pipe($.size({title: 'build', gzip: true}));
 });
 
