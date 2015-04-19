@@ -35,11 +35,11 @@ void main() {
                  -(coloruv[1] - 0.5)/0.5
                  ) - vec2(1.0/256.0, -1.0/256.0) ;
 
-  // // if we don't have a velocity, stop rendering
-  // if (abs(uv).x + abs(uv).y <= 0.0001) {
-  //   // gl_FragColor.a = 0.0;
-  //   discard;
-  // }
+  // if we don't have a velocity, stop rendering
+  if (abs(uv).x + abs(uv).y < 0.001) {
+    // gl_FragColor.a = 0.0;
+    discard;
+  }
 
 
 
@@ -52,21 +52,15 @@ void main() {
 
   // Either mix the color or just add them
   gl_FragColor = mix(colornew, colordrawing, colordrawing.a);
+  return;
 
-  // gl_FragColor = colornew+colordrawing;
-  if (colorold.rgb == gl_FragColor.rgb) {
-    // 1  less opaque if color remains constant
-    gl_FragColor.a = max(gl_FragColor.a - 1.0/256.0, 0.0);
-  }
-  if (abs(uv).x  + abs(uv).y <= 0.0001) {
+  // Optional, fade out on the coast
+  if (abs(uv).x  + abs(uv).y <= 0.001) {
     // fade out points on land
-    gl_FragColor.a = max(gl_FragColor.a - 5.0/256.0, 0.0);
+    // gl_FragColor.a = max(gl_FragColor.a - 5.0/256.0, 0.0);
+    gl_FragColor = max(gl_FragColor - 3.0/256.0, 0.0);
   }
-
-  if (u_clear3d) {
-    // clear if clear, workaround
-    gl_FragColor.a = 0.0;
-  };
+  return;
 
 
 }

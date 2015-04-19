@@ -14,10 +14,11 @@ var drawingContext = drawing.getContext('2d');
 // the webgl context
 var gl = setupWebGL(webgl, {
     preserveDrawingBuffer: true,
-    premultipliedAlpha: false,
+    premultipliedAlpha: true,
     stencil: false
 });
-
+gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+// gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 // the texture that we're using
 var textures = [
     {
@@ -45,7 +46,7 @@ var textures = [
     {
         name: 'uv',
         clamping: gl.CLAMP_TO_EDGE,
-        interpolation: gl.NEAREST,
+        interpolation: gl.LINEAR,
         texture: null,
         sampler: null,
         fbo: null,
@@ -70,7 +71,7 @@ var framebuffers = [
     {
         name: 'fbo0',
         clamping: gl.CLAMP_TO_EDGE,
-        interpolation: gl.NEAREST,
+        interpolation: gl.LINEAR,
         texture: null,
         sampler: null,
         fbo: null,
@@ -182,7 +183,9 @@ Promise.all([vertexSource, fragmentSource])
             t.texture = texture;
 
             // Fill the texture with the corresponding element
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.element);
+            console.log(texture.element);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, t.element);
+
 
             // lookup the sampler locations.
             var u_imageLocation = gl.getUniformLocation(program, "u_image" + t.name);
@@ -330,32 +333,28 @@ Promise.all([vertexSource, fragmentSource])
                 // Also, adjust for fpsInterval not being multiple of 16.67
                 then = now - (elapsed % fpsInterval);
 
-
                 // draw to the screen
                 gl.bindFramebuffer(gl.FRAMEBUFFER, null);
                 // upload the active drawing
                 gl.activeTexture(textures[1].id);
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textures[1].element);
                 // clear the screen
-                gl.clearColor(1.0, 0.0, 0.0, 0.2);
+                gl.clearColor(0.0, 0.0, 0.0, 0.0);
                 gl.clear(gl.COLOR_BUFFER_BIT);
                 // draw
                 // finally draw the result to the canvas.
                 gl.uniform1f(flipYLocation, -1);  // need to y flip for canvas
                 gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
-
                 // // Ping-pong the framebuffers
                 // // Select the texture of the previous framebuffer
                 var previous = framebuffers[0];
                 var current = framebuffers[1];
 
-                // console.log(previous, current);
-
                 // draw to this fbo
                 gl.bindFramebuffer(gl.FRAMEBUFFER, current.fbo);
                 // clear the screen
-                gl.clearColor(0.0, 1.0, 0.0, 0.2);
+                gl.clearColor(0.0, 0.0, 0.0, 0.0);
                 gl.clear(gl.COLOR_BUFFER_BIT);
                 // draw
                 // finally draw the result to the framebuffer
@@ -385,7 +384,7 @@ Promise.all([vertexSource, fragmentSource])
             }
         };
 
-        startAnimating(0.5);
+        startAnimating(60.0);
         // render();
     });
 
