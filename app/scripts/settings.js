@@ -1,3 +1,6 @@
+/* jshint: exported settings */
+'use strict';
+
 // settings for gui
 var settings = {
     clear2d: false,

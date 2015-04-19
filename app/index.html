@@ -77,9 +77,11 @@
     <!-- endbuild -->
 
     <!-- build:js scripts/main.js -->
-    <script src="scripts/webgl-utils.js"></script>
+    <!-- scripts from others that are not properly packaged -->
+    <script src="scripts-external/webgl-utils.js"></script>
+    <script src="scripts-external/sketch.js"></script>
+    <!-- my scripts -->
     <script src="scripts/settings.js"></script>
-    <script src="scripts/sketch.js"></script>
     <script src="scripts/map.js"></script>
     <script src="scripts/draw.js"></script>
     <script src="scripts/main.js"></script>

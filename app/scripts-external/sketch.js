@@ -1,8 +1,8 @@
+/* exported Sketch */
 
 /* Copyright (C) 2013 Justin Windle, http://soulwire.co.uk */
 
 (function ( root, factory ) {
-    
     if ( typeof exports === 'object' ) {
 
         // CommonJS like

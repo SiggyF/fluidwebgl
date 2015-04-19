@@ -1,9 +1,9 @@
+/* exported: sketch  */
+'use strict';
+
 var COLOURS = [ '#E3EB64', '#A7EBCA', '#DD2244', '#D8EBA7', '#868E80' ];
-// var COLOURS = [ '#222222', '#444444' ];
-// var COLOURS = [ '#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF'];
-// var COLOURS = [ '#FF2244', '#FF2244', '#FF2244', '#FF2244', '#FF2244'];
 var radius = 0;
-var sketch = Sketch.create({
+Sketch.create({
     element: document.getElementById('drawing'),
     // if you don't pass a container, Sketch wil append the element to the body
     container: document.getElementById('drawingcontainer'),
@@ -20,7 +20,9 @@ var sketch = Sketch.create({
     },
     // Event handlers
     keydown: function() {
-        if ( this.keys.C ) this.clear();
+        if ( this.keys.C ) {
+            this.clear();
+        }
     },
     // Mouse & touch events are merged, so handling touch events by default
     // and powering sketches using the touches array is recommended for easy
@@ -55,7 +57,6 @@ var sketch = Sketch.create({
             this.beginPath();
             this.moveTo( touch.ox, touch.oy );
             this.arc(touch.ox, touch.oy, radius, 0, 2*Math.PI);
-            this.stroke();
             this.fill();
         }
         console.log('click', this);
@@ -89,6 +90,3 @@ var sketch = Sketch.create({
     //     }
     // }
 });
-// map.on('viewreset', function(evt){
-//     console.log('we should resize');
-// });
