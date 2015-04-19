@@ -13,7 +13,7 @@ var drawing = document.getElementById('drawing');
 var drawingContext = drawing.getContext('2d');
 // the webgl context
 var gl = setupWebGL(webgl, {
-    preserveDrawingBuffer: true,
+    preserveDrawingBuffer: false,
     premultipliedAlpha: true,
     stencil: false
 });
