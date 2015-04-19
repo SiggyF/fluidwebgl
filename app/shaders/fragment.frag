@@ -1,48 +1,66 @@
 precision mediump float;
 
 // our textures
-// drawing from previous timestep
-uniform sampler2D u_imagewebgl;
 // current drawing
 uniform sampler2D u_imagedrawing;
 // velocities
 uniform sampler2D u_imageuv;
+// buffer 0 (previous timestep)
+uniform sampler2D u_imagefbo0;
 
-// buffer 0
-uniform sampler2D u_imagedrawing0;
-// buffer 1
-uniform sampler2D u_imagedrawing1;
+uniform vec2 u_webglSize;
+
+// Should we clear?
+uniform bool u_clear3d;
 
 // the texCoords passed in from the vertex shader, in 0,1.
 varying vec2 v_texCoord;
 
-void main() {
 
+void main() {
   // get color from drawing
+  vec4 fbo0 = texture2D(u_imagefbo0, v_texCoord);
+  vec4 colorold = fbo0;
   vec4 colordrawing = texture2D(u_imagedrawing, v_texCoord);
 
-  // old color at current location
-  vec4 colorold = texture2D(u_imagewebgl, v_texCoord);
-
   // get uv velocity
-  vec4 coloruv = texture2D(u_imageuv, v_texCoord);
+  vec2 flipCoord = vec2(v_texCoord[0], 1.0-v_texCoord[1]);
 
-  // uv in pixels/frame
-  vec2 uv = vec2((coloruv[0] - 0.5)/0.5 , (coloruv[1] - 0.5)/0.5) ;
+  // I want to flip y, but can't get it working
+  vec4 coloruv = texture2D(u_imageuv, flipCoord);
+
+  // uv in pixels/frame (0.5/128.0) -> correction for
+  vec2 uv = vec2(
+                 (coloruv[0] - 0.5)/0.5,
+                 -(coloruv[1] - 0.5)/0.5
+                 ) - vec2(1.0/256.0, -1.0/256.0) ;
+
+  // if we don't have a velocity, stop rendering
+  if (abs(uv).x + abs(uv).y < 0.001) {
+    // gl_FragColor.a = 0.0;
+    discard;
+  }
+
+
 
   // get advected color from previous texture
-  // vec4 colornew = texture2D(u_imagewebgl, v_texCoord - uv/100.0 ) ;
-  vec4 colornew = texture2D(u_imagewebgl, v_texCoord - uv/60.0);
 
-  //  vec4 colornew = texture2D(u_imagewebgl, v_texCoord - vec2(0.001, 0.0)) ;
-  // vec4 colornew = texture2D(u_imagewebgl, v_texCoord);
-  // vec4 colornew = gl_FragColor;
-  vec4 textureCoordinate = vec4(v_texCoord[0], v_texCoord[1], 0.0, 1.0);
+  // render using the old framebuffer
+  vec2 source = v_texCoord - uv/60.0;
+  vec4 colornew = texture2D(u_imagefbo0, source);
 
-  // gl_FragColor = vec4(min(colornew.rgb, colordrawing.rgb), max(colornew[3], colordrawing[3]));
+
+  // Either mix the color or just add them
   gl_FragColor = mix(colornew, colordrawing, colordrawing.a);
-  gl_FragColor.a = min(gl_FragColor.a, abs(uv).x + abs(uv).y);
-  // gl_FragColor = colornew + colordrawing;
+  return;
+
+  // Optional, fade out on the coast
+  if (abs(uv).x  + abs(uv).y <= 0.001) {
+    // fade out points on land
+    // gl_FragColor.a = max(gl_FragColor.a - 5.0/256.0, 0.0);
+    gl_FragColor = max(gl_FragColor - 3.0/256.0, 0.0);
+  }
+  return;
 
 
 }

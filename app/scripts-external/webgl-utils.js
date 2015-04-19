@@ -1,3 +1,11 @@
+// jshint quotmark:false
+/* exported createAugmentedTypedArray, createAttribsFromArrays, createBuffersFromArrays,
+createBufferInfoFromArrays, createAttributeSetters, createProgram,
+createProgramFromScripts, createProgramFromSources, createProgramInfo,
+createUniformSetters, drawBufferInfo, drawObjectList, getWebGLContext,
+updateCSSIfInIFrame, getExtensionWithKnownPrefixes, resizeCanvasToDisplaySize,
+setAttributes, setBuffersAndAttributes, setUniforms, setupWebGL */
+
 /*
  * Copyright 2012, Gregg Tavares.
  * All rights reserved.
@@ -28,8 +36,8 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 (function (root, factory) {
+    'use strict';
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
         define([], factory);
@@ -55,7 +63,7 @@
         if (topWindow.console && topWindow.console.log) {
             topWindow.console.log(msg);
         }
-    };
+    }
 
     /**
      * Wrapped logging function.
@@ -70,7 +78,7 @@
                 topWindow.console.log(msg);
             }
         }
-    };
+    }
 
     /**
      * Turn off all logging.
@@ -78,7 +86,7 @@
     function loggingOff() {
         log = function() {};
         error = function() {};
-    };
+    }
 
     /**
      * Check if the page is embedded.
@@ -88,7 +96,7 @@
     function isInIFrame(w) {
         w = w || topWindow;
         return w != w.top;
-    };
+    }
 
     /**
      * Converts a WebGL enum to a string
@@ -103,7 +111,7 @@
             }
         }
         return "0x" + value.toString(16);
-    };
+    }
 
     /**
      * Creates the HTLM for a failure message
@@ -119,7 +127,7 @@
             '<div style="">' + msg + '</div>' +
             '</div>' +
             '</td></tr></table>';
-    };
+    }
 
     /**
      * Mesasge for getting a webgl browser
@@ -154,7 +162,7 @@
             if (container) {
                 container.innerHTML = makeFailHTML(str);
             }
-        };
+        }
 
         if (!topWindow.WebGLRenderingContext) {
             showLink(GET_A_WEBGL_BROWSER);
@@ -166,7 +174,7 @@
             showLink(OTHER_PROBLEM);
         }
         return context;
-    };
+    }
 
     /**
      * Creates a webgl context.
@@ -1408,7 +1416,7 @@
         setAttributes: setAttributes,
         setBuffersAndAttributes: setBuffersAndAttributes,
         setUniforms: setUniforms,
-        setupWebGL: setupWebGL,
+        setupWebGL: setupWebGL
     };
 
 }));
