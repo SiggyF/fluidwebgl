@@ -65,6 +65,24 @@ _.each(textures, function(texture){
     });
 });
 
+_.each(textures, function(texture){
+    $(texture.element).on('loadedmetadata', function(){
+        console.log(this, 'metadata loaded');
+        texture.width = texture.element.videoWidth;
+        texture.height = texture.element.videoHeight;
+    });
+    $(texture.element).on('play', function(){
+        console.log(this, 'playing');
+    });
+    $(texture.element).on('timeupdate', function(x){
+        // activate current texture
+        gl.activeTexture(texture.id);
+        // load the video into it
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.element);
+
+    });
+});
+
 
 // the framebuffers that we need
 var framebuffers = [
@@ -373,6 +391,14 @@ Promise.all([vertexSource, fragmentSource])
                 if (settings.clear2d) {
                     drawingContext.clearRect(0, 0, drawing.width, drawing.height);
                 }
+                // clear 3d, not working at the moment....
+                if (settings.clear3d) {
+                    gl.bindFramebuffer(gl.FRAMEBUFFER, previous.fbo);
+                    gl.clearColor(0.0, 0.0, 0.0, 0.0);
+                    gl.clear();
+                    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+                }
+
                 // TESTING...Report #seconds since start and achieved fps.
                 var sinceStart = now - startTime;
                 var currentFps = Math.round(1000 / (sinceStart / ++frameCount) * 100) / 100;

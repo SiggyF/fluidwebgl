@@ -2,6 +2,7 @@
 'use strict';
 
 var COLOURS = [ '#E3EB64', '#A7EBCA', '#DD2244', '#D8EBA7', '#868E80' ];
+COLOURS = ['#96CEB4', '#FFEEAD', '#FF6F69', '#FFCC5C', '#AAD8B0'];
 var radius = 0;
 Sketch.create({
     element: document.getElementById('drawing'),
@@ -16,7 +17,7 @@ Sketch.create({
         console.log( 'setup' );
     },
     update: function() {
-        radius = 10 ;
+        radius = 2.5 ;
     },
     // Event handlers
     keydown: function() {
