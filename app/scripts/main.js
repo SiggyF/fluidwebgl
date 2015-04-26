@@ -17,6 +17,9 @@ var gl = setupWebGL(webgl, {
     premultipliedAlpha: true,
     stencil: false
 });
+
+// gl.enable(gl.BLEND);
+// gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 // gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 // the texture that we're using
@@ -301,8 +304,8 @@ Promise.all([vertexSource, fragmentSource])
         var fpsInterval, startTime, now, then, elapsed;
 
 
-        function startAnimating(fps) {
-            fpsInterval = 1000 / fps;
+        function startAnimating() {
+            fpsInterval = 1000 / settings.fps;
             then = Date.now();
             startTime = then;
             console.log(startTime);
@@ -329,7 +332,7 @@ Promise.all([vertexSource, fragmentSource])
 
             // if enough time has elapsed, draw the next frame
 
-            if (elapsed > fpsInterval) {
+            if (elapsed > 1000 / settings.fps) {
 
                 // first update the settings
                 _.each(glSettings, function(setting){
@@ -349,7 +352,7 @@ Promise.all([vertexSource, fragmentSource])
 
                 // Get ready for next frame by setting then=now, but...
                 // Also, adjust for fpsInterval not being multiple of 16.67
-                then = now - (elapsed % fpsInterval);
+                then = now - (elapsed % (1000 / settings.fps));
 
                 // draw to the screen
                 gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -395,7 +398,7 @@ Promise.all([vertexSource, fragmentSource])
                 if (settings.clear3d) {
                     gl.bindFramebuffer(gl.FRAMEBUFFER, previous.fbo);
                     gl.clearColor(0.0, 0.0, 0.0, 0.0);
-                    gl.clear();
+                    gl.clear(gl.COLOR_BUFFER_BIT);
                     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
                 }
 
@@ -410,7 +413,7 @@ Promise.all([vertexSource, fragmentSource])
             }
         };
 
-        startAnimating(60.0);
+        startAnimating();
         // render();
     });
 

@@ -3,6 +3,8 @@
 
 var COLOURS = [ '#E3EB64', '#A7EBCA', '#DD2244', '#D8EBA7', '#868E80' ];
 COLOURS = ['#96CEB4', '#FFEEAD', '#FF6F69', '#FFCC5C', '#AAD8B0'];
+COLOURS = ['red', 'green', 'blue', 'grey', 'orange'];
+COLOURS = ['black', 'white', 'grey'];
 var radius = 0;
 Sketch.create({
     element: document.getElementById('drawing'),
@@ -24,6 +26,38 @@ Sketch.create({
         if ( this.keys.C ) {
             this.clear();
         }
+        if ( this.keys.P ) {
+
+            for (var i = 0, l = 1000; i < l; i++) {
+                var x = Math.random() * this.element.width;
+                var y = Math.random() * this.element.height;
+                this.lineCap = 'round';
+                this.lineJoin = 'round';
+                this.fillStyle = COLOURS[Math.floor(Math.random()*COLOURS.length)];
+                this.lineWidth = radius;
+                this.beginPath();
+                this.moveTo( x, y );
+                this.arc(x, y, radius, 0, 2*Math.PI);
+                this.fill();
+
+            }
+        }
+        if ( this.keys.Q ) {
+            for (var i = 0; i < this.element.width; i+=50) {
+                for (var j = 0; j < this.element.height; j+=50) {
+                    var x = Math.random() * this.element.width;
+                    var y = Math.random() * this.element.height;
+                    this.lineCap = 'round';
+                    this.lineJoin = 'round';
+                    this.fillStyle = 'white';
+                    this.lineWidth = radius;
+                    this.beginPath();
+                    this.moveTo( i, j );
+                    this.arc(i, j, radius, 0, 2*Math.PI);
+                    this.fill();
+                }
+            }
+        }
     },
     // Mouse & touch events are merged, so handling touch events by default
     // and powering sketches using the touches array is recommended for easy
@@ -37,14 +71,12 @@ Sketch.create({
             touch = this.touches[i];
             this.lineCap = 'round';
             this.lineJoin = 'round';
-            this.fillStyle = this.strokeStyle = COLOURS[Math.floor(Math.random()*COLOURS.length)];
-            // this.fillStyle = this.strokeStyle = 'black';
+            this.strokeStyle = COLOURS[Math.floor(Math.random()*COLOURS.length)];
             this.lineWidth = radius;
             this.beginPath();
             this.moveTo( touch.ox, touch.oy );
             this.lineTo( touch.x, touch.y );
             this.stroke();
-            this.fill();
         }
     },
     click: function() {
@@ -52,8 +84,7 @@ Sketch.create({
             touch = this.touches[i];
             this.lineCap = 'round';
             this.lineJoin = 'round';
-            this.fillStyle = this.strokeStyle = COLOURS[Math.floor(Math.random()*COLOURS.length)];
-            // this.fillStyle = this.strokeStyle = 'black';
+            this.fillStyle = COLOURS[Math.floor(Math.random()*COLOURS.length)];
             this.lineWidth = radius;
             this.beginPath();
             this.moveTo( touch.ox, touch.oy );

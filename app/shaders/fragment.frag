@@ -16,6 +16,7 @@ uniform bool u_circle;
 uniform bool u_mask;
 uniform bool u_fade;
 
+const float u_scale = 400.0;
 // the texCoords passed in from the vertex shader, in 0,1.
 varying vec2 v_texCoord;
 
@@ -93,7 +94,7 @@ void main() {
 
   // get advected color from previous texture
   // render using the old framebuffer
-  vec2 source = v_texCoord - uv/60.0;
+  vec2 source = v_texCoord - uv/(u_scale);
   vec4 colornew = texture2D(u_imagefbo0, source);
 
   // Either mix the color or just add them
@@ -102,13 +103,13 @@ void main() {
     return;
   }
   if (u_fade) {
-    gl_FragColor = max(gl_FragColor - 3.0/256.0, 0.0);
+    gl_FragColor = max(gl_FragColor - 1.0/u_scale, 0.0);
   }
   // Optional, fade out on the coast
   if (abs(uv).x  + abs(uv).y <= 0.001) {
     // fade out points on land
     // gl_FragColor.a = max(gl_FragColor.a - 5.0/256.0, 0.0);
-    gl_FragColor = max(gl_FragColor - 3.0/256.0, 0.0);
+    gl_FragColor = max(gl_FragColor - 1.0/u_scale, 0.0);
   }
   return;
 

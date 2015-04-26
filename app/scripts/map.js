@@ -9,8 +9,8 @@ L.ImageOverlay.Canvas = L.ImageOverlay.extend({
     // The width and height relate to the drawing canvas
     // This is independent of the size of the canvas on the screen
     options: {
-        width: 1000,
-        height: 1000
+        width: 2000,
+        height: 2000
     },
 
     // We need a bounding box where we're drawing on
@@ -106,5 +106,6 @@ L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
 var southWest = L.latLng(37.4487848675731, -123.09234894317646),
     northEast = L.latLng(38.780310596186474, -121.2218887213739),
     bounds = L.latLngBounds(southWest, northEast);
+
 L.imageOverlay.canvas(bounds, {id: 'webgl'}).addTo(map);
 L.imageOverlay.canvas(bounds, {id: 'drawing'}).addTo(map);
