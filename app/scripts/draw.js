@@ -2,10 +2,10 @@
 'use strict';
 
 var COLOURS = [ '#E3EB64', '#A7EBCA', '#DD2244', '#D8EBA7', '#868E80' ];
-COLOURS = ['#96CEB4', '#FFEEAD', '#FF6F69', '#FFCC5C', '#AAD8B0'];
 COLOURS = ['red', 'green', 'blue', 'grey', 'orange'];
 COLOURS = ['black', 'white', 'grey'];
-var radius = 0;
+COLOURS = ['#96CEB4', '#FFEEAD', '#FF6F69', '#FFCC5C', '#AAD8B0'];
+var radius = 2.5;
 Sketch.create({
     element: document.getElementById('drawing'),
     // if you don't pass a container, Sketch wil append the element to the body
@@ -19,18 +19,19 @@ Sketch.create({
         console.log( 'setup' );
     },
     update: function() {
-        radius = 2.5 ;
+        radius = radius ;
     },
     // Event handlers
     keydown: function() {
+        var i, j, l, x, y;
         if ( this.keys.C ) {
             this.clear();
         }
         if ( this.keys.P ) {
 
-            for (var i = 0, l = 1000; i < l; i++) {
-                var x = Math.random() * this.element.width;
-                var y = Math.random() * this.element.height;
+            for (i = 0, l = 1000; i < l; i++) {
+                x = Math.random() * this.element.width;
+                y = Math.random() * this.element.height;
                 this.lineCap = 'round';
                 this.lineJoin = 'round';
                 this.fillStyle = COLOURS[Math.floor(Math.random()*COLOURS.length)];
@@ -43,10 +44,10 @@ Sketch.create({
             }
         }
         if ( this.keys.Q ) {
-            for (var i = 0; i < this.element.width; i+=50) {
-                for (var j = 0; j < this.element.height; j+=50) {
-                    var x = Math.random() * this.element.width;
-                    var y = Math.random() * this.element.height;
+            for (i = 0; i < this.element.width; i+=50) {
+                for (j = 0; j < this.element.height; j+=50) {
+                    x = Math.random() * this.element.width;
+                    y = Math.random() * this.element.height;
                     this.lineCap = 'round';
                     this.lineJoin = 'round';
                     this.fillStyle = 'white';

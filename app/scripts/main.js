@@ -77,7 +77,7 @@ _.each(textures, function(texture){
     $(texture.element).on('play', function(){
         console.log(this, 'playing');
     });
-    $(texture.element).on('timeupdate', function(x){
+    $(texture.element).on('timeupdate', function(){
         // activate current texture
         gl.activeTexture(texture.id);
         // load the video into it
