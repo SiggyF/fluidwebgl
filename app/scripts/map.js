@@ -9,8 +9,8 @@ L.ImageOverlay.Canvas = L.ImageOverlay.extend({
     // The width and height relate to the drawing canvas
     // This is independent of the size of the canvas on the screen
     options: {
-        width: 2000,
-        height: 2000
+        width: 1024,
+        height: 1024
     },
 
     // We need a bounding box where we're drawing on

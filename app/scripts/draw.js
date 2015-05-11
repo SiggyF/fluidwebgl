@@ -23,10 +23,13 @@ Sketch.create({
     },
     // Event handlers
     keydown: function() {
+        // some counters
         var i, j, l, x, y;
+        // Key events
         if ( this.keys.C ) {
             this.clear();
         }
+        // Particles
         if ( this.keys.P ) {
 
             for (i = 0, l = 1000; i < l; i++) {
@@ -43,6 +46,7 @@ Sketch.create({
 
             }
         }
+        // Quivers
         if ( this.keys.Q ) {
             for (i = 0; i < this.element.width; i+=50) {
                 for (j = 0; j < this.element.height; j+=50) {
@@ -58,6 +62,22 @@ Sketch.create({
                     this.fill();
                 }
             }
+        }
+        if ( this.keys.G ) {
+            for (i = 0; i < this.element.width; i+=50) {
+                this.lineCap = 'round';
+                this.lineJoin = 'round';
+                this.fillStyle = 'white';
+                this.lineWidth = 1.0;
+                this.beginPath();
+                this.moveTo( i, 0 );
+                this.lineTo(i, this.element.width);
+                this.stroke();
+                this.moveTo( 0, i );
+                this.lineTo(this.element.height, i);
+                this.stroke();
+            }
+
         }
     },
     // Mouse & touch events are merged, so handling touch events by default

@@ -13,6 +13,8 @@ uniform vec2 u_webglSize;
 // Should we clear?
 uniform bool u_clear3d;
 uniform bool u_circle;
+uniform bool u_horizontal;
+
 uniform bool u_mask;
 uniform bool u_fade;
 
@@ -20,8 +22,9 @@ const float u_scale = 200.0;
 // the texCoords passed in from the vertex shader, in 0,1.
 varying vec2 v_texCoord;
 
+
 vec2 uvcircle(vec2 v_texCoord) {
-  float PI = 3.14159265;
+  float PI = 3.141592653589793;
   float r = length(v_texCoord*2.0 - 1.0);
   // coordinate in -1, 1
   float x = (v_texCoord.x - 0.5)*2.0;
@@ -37,9 +40,12 @@ vec2 uvcircle(vec2 v_texCoord) {
   return uv;
 }
 
+
+
 void main() {
+  vec4 clearcolor = vec4(0.0, 0.0, 0.0, 0.0);
   if (u_clear3d) {
-    gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);
+    gl_FragColor = clearcolor;
     return;
   };
   // get color from drawing
@@ -53,48 +59,47 @@ void main() {
   // I want to flip y, but can't get it working
   vec4 coloruv = texture2D(u_imageuv, flipCoord);
 
-  // uv in pixels/frame (0.5/128.0) -> correction for
-  // vec2 uv = vec2(
-  //                (coloruv.r - 0.5)/0.5,
-  //                -(coloruv.g - 0.5)/0.5
-  //                ) - vec2(1.0/256.0, -1.0/256.0) ;
 
   // Correction in the range of 5.0???? Why? Compression artifacts...
   vec2 uv = vec2(
-                 (coloruv.r - 0.5)/0.5 - 1.0/256.0,
-                 -(coloruv.g - 0.5)/0.5 - 1.0/256.0
+                 (coloruv.r - 0.5)/0.5 ,
+                 -(coloruv.g - 0.5)/0.5
                  )  ;
 
 
-  // if we don't have a velocity, stop rendering
-  // if (abs(uv).x  + abs(uv).y < 0.0001) {
-  //   gl_FragColor.a = 0.0;
-  //   discard;
-  // }
-  if (u_mask && uv.x == 0.0 && uv.y == 0.0) {
-    gl_FragColor.a = 0.0;
-    discard;
-  }
   // if we're masked stop rendering
   if (u_mask  && coloruv.b > 0.5) {
     gl_FragColor.a = 0.0;
     discard;
   }
 
-  // if we use a circular velocity field, update the uv using a circle
-  if(u_circle) {
-    uv = uvcircle(v_texCoord);
-    float dx = 0.01;
-    float dy = 0.01;
-    vec2 duvdx = (uvcircle(v_texCoord + vec2(dx, 0.0)) - uvcircle(v_texCoord - vec2(dx, 0.0)))/dx ;
-    vec2 duvdy = uvcircle(v_texCoord + vec2(0.0, dy)) - uvcircle(v_texCoord - vec2(0.0, dy)) ;
+  // if the velocity is 0 we don't have to render
+  if (u_mask && uv.x == 0.0 && uv.y == 0.0) {
+    gl_FragColor.a = 0.0;
+    discard;
   }
 
+  // if we use a circular velocity field, update the uv using a circle
+  float dx = 0.01;
+  float dy = 0.01;
+  vec2 duvdx = vec2(0.0, 0.0);
+  vec2 duvdy = vec2(0.0, 0.0);
+  if(u_circle) {
+    uv = uvcircle(v_texCoord);
+    duvdx = (uvcircle(v_texCoord + vec2(dx, 0.0)) - uvcircle(v_texCoord - vec2(dx, 0.0)))/dx ;
+    duvdy = uvcircle(v_texCoord + vec2(0.0, dy)) - uvcircle(v_texCoord - vec2(0.0, dy)) ;
 
+  }
+
+  vec2 horizontal = vec2(0.1, 0.0);
+  if (u_horizontal) {
+    uv = horizontal;
+  }
 
   // get advected color from previous texture
   // render using the old framebuffer
   vec2 source = v_texCoord - uv/(u_scale);
+
   vec4 colornew = texture2D(u_imagefbo0, source);
 
   // Either mix the color or just add them
@@ -102,15 +107,18 @@ void main() {
   if (u_circle) {
     return;
   }
+
+  // Fade out over time
   if (u_fade) {
     gl_FragColor = max(gl_FragColor - 1.0/u_scale, 0.0);
   }
-  // Optional, fade out on the coast
-  if (abs(uv).x  + abs(uv).y <= 0.001) {
-    // fade out points on land
-    // gl_FragColor.a = max(gl_FragColor.a - 5.0/256.0, 0.0);
-    gl_FragColor = max(gl_FragColor - 1.0/u_scale, 0.0);
-  }
+
+  // // Optional, fade out on the coast
+  // if (abs(uv).x  + abs(uv).y <= 0.001) {
+  //   // fade out points on land
+  //   // gl_FragColor.a = max(gl_FragColor.a - 5.0/256.0, 0.0);
+  //   gl_FragColor = max(gl_FragColor - 1.0/u_scale, 0.0);
+  // }
   return;
 
 
