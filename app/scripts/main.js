@@ -1,14 +1,102 @@
-/* global setupWebGL, createProgramFromSources, settings */
+/* global setupWebGL, createProgramFromSources, settings, addDrawing */
 /* jshint devel:true, camelcase: false */
+
 'use strict';
+
+
+// Example usage:
+//
+// create a map in the "map" div, set the view to a given place and zoom
+var map = L.map('map');
+
+// add an OpenStreetMap tile layer
+// we keep this one so no need to add it to the list of layers
+// L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
+//     maxZoom: 18,
+//     attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+//         '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+//         'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+//     id: 'examples.map-i875mjb7'
+// }).addTo(map);
+L.tileLayer('http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png',{
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
+}).addTo(map);
+
+// var models = fetch('data/models.json');
+// models
+//     .then(function(response) {
+//         return response.json();
+//     }).then(function(data) {
+//         console.log(data);
+//         var model = _.values(data.models)[0];
+//         return model;
+//     });
+
+var models = [
+        {
+            "title": "wadden",
+            "abstract": "wadden model",
+            "engine": "delft3d flow",
+            "videos": [
+                "movies/wadden.webm",
+                "movies/wadden.mp4"
+            ],
+            "extent": {
+                "sw": [52.498012542723586, 4.026927471160947],
+                "ne": [53.758518218850185, 6.538724422447244]
+            },
+            "zoom": 10,
+            "width": 1024,
+            "height": 1024
+        },
+        {
+            "title": "San Francisco ",
+            "abstract": "wadden model",
+            "engine": "delft3d flexible mesh",
+            "videos": [
+                "movies/im2.webm",
+                "movies/im2.mp4"
+            ],
+            "extent": {
+                "sw": [37.4487848675731, -123.09234894317646],
+                "ne": [38.780310596186474, -121.2218887213739]
+            },
+            "zoom": 10,
+            "width": 1024,
+            "height": 1024
+        }
+    ];
+
+var model = models[0];
+model.focus = [
+    (model.extent.sw[0] + model.extent.ne[0])/2,
+    (model.extent.sw[1] + model.extent.ne[1])/2
+];
+map.setView(model.focus, model.zoom);
+
+var southWest = L.latLng(model.extent.sw[0], model.extent.sw[1]),
+    northEast = L.latLng(model.extent.ne[0], model.extent.ne[1]),
+    bounds = L.latLngBounds(southWest, northEast);
+
+L.imageOverlay.canvas(bounds, {id: 'webgl'}).addTo(map);
+L.imageOverlay.canvas(bounds, {id: 'drawing'}).addTo(map);
+
 
 // the element where we going to draw on
 var webgl = document.getElementById('webgl');
+console.log('webgl', webgl);
 // the image or video with the current uv map
 var uv = document.getElementById('uv');
 
 // the drawing
 var drawing = document.getElementById('drawing');
+
+
+var drawingcontainer = document.getElementById('drawingcontainer');
+
+// call function defined in drawing.js
+addDrawing(drawing, drawingcontainer);
+
 // the 2d context
 var drawingContext = drawing.getContext('2d');
 // the webgl context
@@ -204,9 +292,7 @@ Promise.all([vertexSource, fragmentSource])
             t.texture = texture;
 
             // Fill the texture with the corresponding element
-            console.log(texture.element);
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, t.element);
-
 
             // lookup the sampler locations.
             var u_imageLocation = gl.getUniformLocation(program, "u_image" + t.name);
@@ -416,6 +502,7 @@ Promise.all([vertexSource, fragmentSource])
         startAnimating();
         // render();
     });
+
 
 
 

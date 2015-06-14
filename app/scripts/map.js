@@ -1,3 +1,5 @@
+/* exported togglecontrols */
+
 'use strict';
 
 /*
@@ -84,28 +86,33 @@ L.imageOverlay.canvas = function (bounds, options) {
 
 
 
-// Example usage:
-//
-// create a map in the "map" div, set the view to a given place and zoom
-var map = L.map('map').setView([37.92, -122.07], 10);
 
-// add an OpenStreetMap tile layer
-L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
-    maxZoom: 18,
-    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-        '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-        'Imagery © <a href="http://mapbox.com">Mapbox</a>',
-    id: 'examples.map-i875mjb7'
-}).addTo(map);
+function togglecontrols(map){
+    // disable the controls of the map
+    if (map.dragging.enabled()) {
+        console.log('disabling map controls');
+        map.dragging.disable();
+        map.touchZoom.disable();
+        map.doubleClickZoom.disable();
+        map.scrollWheelZoom.disable();
+        map.boxZoom.disable();
+        map.keyboard.disable();
+        if (map.tap) {
+            map.tap.disable();
+        }
+        document.getElementById('map').style.cursor='default';
+    } else {
+        console.log('enable map controls');
+        map.dragging.enable();
+        map.touchZoom.enable();
+        map.doubleClickZoom.enable();
+        map.scrollWheelZoom.enable();
+        map.boxZoom.enable();
+        map.keyboard.enable();
+        if (map.tap) {
+            map.tap.enable();
+        }
+        document.getElementById('map').style.cursor='grab';
+    }
 
-
-// var southWest = L.latLng(37.405, -122.66),
-//     northEast = L.latLng(38.305, -121.885),
-//     bounds = L.latLngBounds(southWest, northEast);
-
-var southWest = L.latLng(37.4487848675731, -123.09234894317646),
-    northEast = L.latLng(38.780310596186474, -121.2218887213739),
-    bounds = L.latLngBounds(southWest, northEast);
-
-L.imageOverlay.canvas(bounds, {id: 'webgl'}).addTo(map);
-L.imageOverlay.canvas(bounds, {id: 'drawing'}).addTo(map);
+}

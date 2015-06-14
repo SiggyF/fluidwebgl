@@ -18,7 +18,7 @@ uniform bool u_horizontal;
 uniform bool u_mask;
 uniform bool u_fade;
 
-const float u_scale = 200.0;
+const float u_scale = 1000.0;
 // the texCoords passed in from the vertex shader, in 0,1.
 varying vec2 v_texCoord;
 
