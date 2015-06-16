@@ -7,7 +7,7 @@
 // Example usage:
 //
 // create a map in the "map" div, set the view to a given place and zoom
-var map = L.map('map');
+// var map = L.map('map');
 
 // add an OpenStreetMap tile layer
 // we keep this one so no need to add it to the list of layers
@@ -18,9 +18,12 @@ var map = L.map('map');
 //         'Imagery © <a href="http://mapbox.com">Mapbox</a>',
 //     id: 'examples.map-i875mjb7'
 // }).addTo(map);
-L.tileLayer('http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png',{
-    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
-}).addTo(map);
+// L.tileLayer('http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png',{
+//     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
+// }).addTo(map);
+
+L.mapbox.accessToken = 'pk.eyJ1Ijoic2lnZ3lmIiwiYSI6Il8xOGdYdlEifQ.3-JZpqwUa3hydjAJFXIlMA';
+var map = L.mapbox.map('map', 'siggyf.c74e2e04');
 
 // var models = fetch('data/models.json');
 // models
@@ -33,39 +36,43 @@ L.tileLayer('http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png',{
 //     });
 
 var models = [
-        {
-            "title": "wadden",
-            "abstract": "wadden model",
-            "engine": "delft3d flow",
-            "videos": [
-                "movies/wadden.webm",
-                "movies/wadden.mp4"
-            ],
-            "extent": {
-                "sw": [52.498012542723586, 4.026927471160947],
-                "ne": [53.758518218850185, 6.538724422447244]
-            },
-            "zoom": 10,
-            "width": 1024,
-            "height": 1024
+    {
+        "title": "wadden",
+        "abstract": "wadden model",
+        "engine": "delft3d flow",
+        "videos": [
+            "movies/wadden.webm",
+            "movies/wadden.mp4"
+        ],
+        "extent": {
+            "sw": [52.498012542723586, 4.026927471160947],
+            "ne": [53.758518218850185, 6.538724422447244]
         },
-        {
-            "title": "San Francisco ",
-            "abstract": "wadden model",
-            "engine": "delft3d flexible mesh",
-            "videos": [
-                "movies/im2.webm",
-                "movies/im2.mp4"
-            ],
-            "extent": {
-                "sw": [37.4487848675731, -123.09234894317646],
-                "ne": [38.780310596186474, -121.2218887213739]
-            },
-            "zoom": 10,
-            "width": 1024,
-            "height": 1024
-        }
-    ];
+        "zoom": 10,
+        "width": 1024,
+        "height": 1024,
+        "type": "img",
+        "url": "images/monolisa.jpg"
+
+    },
+    {
+        "title": "San Francisco ",
+        "abstract": "wadden model",
+        "engine": "delft3d flexible mesh",
+        "videos": [
+            "movies/im2.webm",
+            "movies/im2.mp4"
+        ],
+        "extent": {
+            "sw": [37.4487848675731, -123.09234894317646],
+            "ne": [38.780310596186474, -121.2218887213739]
+        },
+        "zoom": 10,
+        "width": 1024,
+        "height": 1024,
+        "type": "canvas"
+    }
+];
 
 var model = models[0];
 model.focus = [
@@ -79,8 +86,19 @@ var southWest = L.latLng(model.extent.sw[0], model.extent.sw[1]),
     bounds = L.latLngBounds(southWest, northEast);
 
 L.imageOverlay.canvas(bounds, {id: 'webgl'}).addTo(map);
-L.imageOverlay.canvas(bounds, {id: 'drawing'}).addTo(map);
+if (model.type === 'canvas') {
+    L.imageOverlay.canvas(bounds, {id: 'drawing'}).addTo(map);
+}
+else {
+    // model should be of type img
+    var overlay = L.imageOverlay(model.url, bounds, {id: 'drawing'}).addTo(map);
+    var img = $(overlay._image);
+    img.attr('id', 'drawing');
+    img.attr('width', 1024);
+    img.attr('height', 1024);
+    console.log(overlay, img);
 
+}
 
 // the element where we going to draw on
 var webgl = document.getElementById('webgl');
@@ -91,14 +109,15 @@ var uv = document.getElementById('uv');
 // the drawing
 var drawing = document.getElementById('drawing');
 
+if (model.type == 'canvas') {
+    var drawingcontainer = document.getElementById('drawingcontainer');
+    // call function defined in drawing.js
+    addDrawing(drawing, drawingcontainer);
+    // the 2d context
+    var drawingContext = drawing.getContext('2d');
+}
 
-var drawingcontainer = document.getElementById('drawingcontainer');
 
-// call function defined in drawing.js
-addDrawing(drawing, drawingcontainer);
-
-// the 2d context
-var drawingContext = drawing.getContext('2d');
 // the webgl context
 var gl = setupWebGL(webgl, {
     preserveDrawingBuffer: false,
@@ -115,7 +134,7 @@ var textures = [
     {
         name: 'webgl',
         clamping: gl.CLAMP_TO_EDGE,
-        interpolation: gl.NEAREST,
+        interpolation: gl.LINEAR,
         texture: null,
         sampler: null,
         fbo: null,
@@ -443,8 +462,16 @@ Promise.all([vertexSource, fragmentSource])
                 // draw to the screen
                 gl.bindFramebuffer(gl.FRAMEBUFFER, null);
                 // upload the active drawing
-                gl.activeTexture(textures[1].id);
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textures[1].element);
+                if (settings.clear2d) {
+                    gl.clearColor(0.0, 0.0, 0.0, 0.0);
+                    gl.activeTexture(textures[1].id);
+                    gl.clear(gl.COLOR_BUFFER_BIT);
+                } else
+                {
+                    gl.activeTexture(textures[1].id);
+                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textures[1].element);
+                }
+
                 // clear the screen
                 gl.clearColor(0.0, 0.0, 0.0, 0.0);
                 gl.clear(gl.COLOR_BUFFER_BIT);
@@ -477,7 +504,7 @@ Promise.all([vertexSource, fragmentSource])
 
 
                 // clear the drawing
-                if (settings.clear2d) {
+                if (settings.clear2d && model.type === 'canvas') {
                     drawingContext.clearRect(0, 0, drawing.width, drawing.height);
                 }
                 // clear 3d, not working at the moment....

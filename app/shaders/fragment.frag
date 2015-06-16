@@ -11,6 +11,7 @@ uniform sampler2D u_imagefbo0;
 uniform vec2 u_webglSize;
 
 // Should we clear?
+uniform bool u_clear2d;
 uniform bool u_clear3d;
 uniform bool u_circle;
 uniform bool u_horizontal;
@@ -52,7 +53,9 @@ void main() {
   vec4 fbo0 = texture2D(u_imagefbo0, v_texCoord);
   vec4 colorold = fbo0;
   vec4 colordrawing = texture2D(u_imagedrawing, v_texCoord);
-
+  if (u_clear2d) {
+    colordrawing = vec4(0.0, 0.0, 0.0, 0.0);
+  }
   // get uv velocity
   vec2 flipCoord = vec2(v_texCoord[0], 1.0-v_texCoord[1]);
 
