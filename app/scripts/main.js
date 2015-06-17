@@ -126,15 +126,15 @@ var gl = setupWebGL(webgl, {
 });
 
 // gl.enable(gl.BLEND);
-// gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 // gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+// gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 // the texture that we're using
 var textures = [
     {
         name: 'webgl',
         clamping: gl.CLAMP_TO_EDGE,
-        interpolation: gl.LINEAR,
+        interpolation: gl.NEAREST,
         texture: null,
         sampler: null,
         fbo: null,
@@ -210,7 +210,7 @@ var framebuffers = [
     {
         name: 'fbo1',
         clamping: gl.CLAMP_TO_EDGE,
-        interpolation: gl.NEAREST,
+        interpolation: gl.LINEAR,
         texture: null,
         sampler: null,
         fbo: null,

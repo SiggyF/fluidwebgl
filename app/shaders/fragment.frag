@@ -113,7 +113,7 @@ void main() {
 
   // Fade out over time
   if (u_fade) {
-    gl_FragColor = max(gl_FragColor - 1.0/u_scale, 0.0);
+    gl_FragColor.a = max(gl_FragColor.a - 0.005, 0.0);
   }
 
   // // Optional, fade out on the coast
