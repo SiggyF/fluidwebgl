@@ -70,8 +70,9 @@ function addDrawing(drawingElement, drawingContainer) {
                 for (i = 0; i < this.element.width; i+=50) {
                     this.lineCap = 'round';
                     this.lineJoin = 'round';
+                    this.strokeStyle = 'rgba(0, 0, 0, 0.3)';
                     this.fillStyle = 'white';
-                    this.lineWidth = 1.0;
+                    this.lineWidth = 2.0;
                     this.beginPath();
                     this.moveTo( i, 0 );
                     this.lineTo(i, this.element.width);
@@ -79,6 +80,7 @@ function addDrawing(drawingElement, drawingContainer) {
                     this.moveTo( 0, i );
                     this.lineTo(this.element.height, i);
                     this.stroke();
+
                 }
 
             }

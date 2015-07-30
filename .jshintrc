@@ -18,7 +18,7 @@
     "jquery": true,
     "globals": {
         "_": false,
-        "L": false,
+        "L": true,
         "Sketch": false,
         "dat": false,
         "fetch": true

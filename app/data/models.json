@@ -1,7 +1,7 @@
 {
     "models": [
         {
-            "title": "wadden",
+            "title": "Wadden",
             "abstract": "wadden model",
             "engine": "delft3d flow",
             "videos": [
