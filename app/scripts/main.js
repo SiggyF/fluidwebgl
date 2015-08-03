@@ -87,7 +87,7 @@ var models = [
     }
 ];
 
-var model = models[2];
+var model = models[1];
 model.focus = [
     (model.extent.sw[0] + model.extent.ne[0])/2,
     (model.extent.sw[1] + model.extent.ne[1])/2
